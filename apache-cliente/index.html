@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario de Contacto</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container mt-5">
+    <h2 class="text-center">Formulario de Contacto</h2>
+    <form id="formulario">
+      <div class="mb-3">
+        <label class="form-label">Nombre:</label>
+        <input type="text" class="form-control" name="nombre"> <!-- ✅ quitado required -->
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email:</label>
+        <input type="email" class="form-control" name="email"> <!-- ✅ quitado required -->
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Mensaje:</label>
+        <textarea class="form-control" name="mensaje"></textarea> <!-- ✅ quitado required -->
+      </div>
+      <button type="submit" class="btn btn-primary">Enviar</button>
+      <button type="button" id="verMensajes" class="btn btn-secondary ms-2">Ver Mensajes</button>
+    </form>
+
+    <hr>
+
+    <h4 class="mt-4">📋 Mensajes guardados</h4>
+    <pre id="resultado" class="bg-white border p-3"></pre>
+  </div>
+
+  <script>
+    const form = document.getElementById('formulario');
+    const resultado = document.getElementById('resultado');
+
+    // 📨 POST al enviar formulario
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const datos = Object.fromEntries(new FormData(form));
+
+      try {
+        const res = await fetch('http://localhost:3000/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+
+        const data = await res.json();
+        alert('Respuesta del servidor: ' + JSON.stringify(data, null, 2));
+      } catch (error) {
+        alert('❌ Error al enviar: ' + error);
+        console.error('Error:', error);
+      }
+    });
+
+    // 📥 GET para ver mensajes guardados
+    document.getElementById('verMensajes').addEventListener('click', async () => {
+      try {
+        const res = await fetch('http://localhost:3000/mensajes');
+        const mensajes = await res.json();
+        resultado.textContent = JSON.stringify(mensajes, null, 2);
+      } catch (error) {
+        resultado.textContent = '❌ Error al obtener mensajes';
+        console.error(error);
+      }
+    });
+  </script>
+
+</body>
+</html>
